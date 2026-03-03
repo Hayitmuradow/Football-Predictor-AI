@@ -3,100 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI FOOTBALL ANALYZER PRO</title>
+    <title>AI Robot PRO - Final</title>
     <style>
         :root { --primary: #38bdf8; --secondary: #10b981; --dark: #0f172a; --card: #1e293b; }
-        body { background: var(--dark); color: white; font-family: sans-serif; padding: 15px; margin: 0; }
-        .card { background: var(--card); border-radius: 15px; padding: 20px; border-top: 5px solid var(--primary); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-        .header { text-align: center; margin-bottom: 25px; }
-        label { display: block; margin-bottom: 8px; font-size: 0.9em; color: #94a3b8; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; font-size: 1em; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; font-size: 1.1em; transition: 0.3s; }
-        .btn:active { transform: scale(0.98); }
-        #result { margin-top: 25px; padding: 20px; border-radius: 12px; display: none; line-height: 1.6; }
-        .win1 { border-left: 6px solid var(--secondary); background: rgba(16, 185, 129, 0.15); }
-        .win2 { border-left: 6px solid #f87171; background: rgba(248, 113, 113, 0.15); }
-        .draw { border-left: 6px solid #f59e0b; background: rgba(245, 158, 11, 0.15); }
+        body { background: var(--dark); color: white; font-family: sans-serif; padding: 15px; }
+        .card { background: var(--card); border-radius: 15px; padding: 20px; border-top: 5px solid var(--primary); }
+        label { display: block; margin: 10px 0 5px; font-size: 0.9em; color: #94a3b8; }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; background: var(--primary); color: white; margin-top: 20px; font-size: 1.1em; }
+        #res { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; line-height: 1.6; border-left: 5px solid var(--secondary); background: rgba(16, 185, 129, 0.1); }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="header">
-        <h2 style="margin:0;">⚽ AI ROBOT PRO</h2>
-        <p style="font-size: 0.8em; color: #94a3b8;">Hünärmen Analiz Ulgamy</p>
-    </div>
+    <h2 style="text-align:center; color:var(--primary);">⚽ AI ANALYZER PRO</h2>
     
-    <label>Öý Komandasy (Ady)</label>
-    <input type="text" id="hN" placeholder="Meselem: Real Madrid">
+    <label>W1 (Öý koeffisýenti)</label>
+    <input type="number" id="k1" step="0.01" placeholder="1.60">
 
-    <label>Myhman Komandasy (Ady)</label>
-    <input type="text" id="aN" placeholder="Meselem: Barselona">
+    <label>X (Deňlik koeffisýenti)</label>
+    <input type="number" id="kx" step="0.01" placeholder="3.50">
 
-    <div style="display: flex; gap: 10px;">
-        <div style="flex: 1;">
-            <label>Öý Koef. (W1)</label>
-            <input type="number" id="hK" step="0.01" placeholder="1.85">
-        </div>
-        <div style="flex: 1;">
-            <label>Myhman Koef. (W2)</label>
-            <input type="number" id="aK" step="0.01" placeholder="3.40">
-        </div>
-    </div>
+    <label>W2 (Myhman koeffisýenti)</label>
+    <input type="number" id="k2" step="0.01" placeholder="4.80">
 
-    <label>Komandalaryň Güýç Ýagdaýy (Forma/Esas)</label>
-    <select id="powerDiff">
-        <option value="1.2">🔥 Öý komanda gaty güýçli (Esas düzüm doly)</option>
-        <option value="1.0" selected>✅ Iki tarap hem kadaly</option>
-        <option value="0.8">⚠️ Öý komanda ýadow / Myhman has taýýar</option>
-        <option value="0.5">❌ Öý komandada uly şikesler bar</option>
+    <label>Komandanyň Hakyky Ýagdaýy</label>
+    <select id="status">
+        <option value="1.2">🔥 Öý komanda gaty güýçli (Ruhy belent)</option>
+        <option value="1.0" selected>✅ Kadaly ýagdaý (Durnukly)</option>
+        <option value="0.8">⚠️ Öý ýadow / Myhman has taýýar</option>
+        <option value="0.6">❌ Öýde esasy oýunçylar ýok</option>
     </select>
 
-    <button class="btn" onclick="analyzeMatch()">PROGNOZY HASAPLA</button>
+    <button class="btn" onclick="calc()">ANALIZI GÖR</button>
 
-    <div id="result"></div>
+    <div id="res"></div>
 </div>
 
 <script>
-    function analyzeMatch() {
-        const hName = document.getElementById('hN').value || "Öý komandasy";
-        const aName = document.getElementById('aN').value || "Myhman komandasy";
-        const hK = parseFloat(document.getElementById('hK').value) || 2.0;
-        const aK = parseFloat(document.getElementById('aK').value) || 2.0;
-        const powerFactor = parseFloat(document.getElementById('powerDiff').value);
-        
-        const resDiv = document.getElementById('result');
+    function calc() {
+        const v1 = parseFloat(document.getElementById('k1').value);
+        const vx = parseFloat(document.getElementById('kx').value);
+        const v2 = parseFloat(document.getElementById('k2').value);
+        const power = parseFloat(document.getElementById('status').value);
+        const resDiv = document.getElementById('res');
+
+        if(!v1 || !vx || !v2) { alert("Koeffisýentleri ýazyň!"); return; }
+
+        // Bukmeker ähtimallygy + Seniň "Güýç" faktoryň
+        let p1 = (1/v1) * 100 * power;
+        let px = (1/vx) * 100;
+        let p2 = (1/v2) * 100;
+        let total = p1 + px + p2;
+
+        let finalP1 = ((p1/total)*100).toFixed(1);
+        let finalP2 = ((p2/total)*100).toFixed(1);
+
         resDiv.style.display = "block";
-        
-        // Robot logikasy: Koeffisýentleri % öwürýäris we güýç faktoryny goşýarys
-        let hProb = (1 / hK) * 100 * powerFactor;
-        let aProb = (1 / aK) * 100;
-        let total = hProb + aProb;
-        
-        // % Paýlaýyş
-        let finalH = ((hProb / total) * 100).toFixed(1);
-        let finalA = ((aProb / total) * 100).toFixed(1);
-        let drawProb = (100 - Math.max(finalH, finalA)) / 2;
-
-        let verdict = "";
-        let colorClass = "";
-
-        if (finalH > 55) {
-            verdict = `🏆 <b>PROGNOZ: ÝEŇIŞ W1</b><br>Robot <b>${hName}</b> ýeňşine ynanýar.<br>🎯 Ähtimallygy: %${finalH}`;
-            colorClass = "win1";
-        } else if (finalA > 55) {
-            verdict = `🏆 <b>PROGNOZ: ÝEŇIŞ W2</b><br>Robot <b>${aName}</b> ýeňşine ynanýar.<br>🎯 Ähtimallygy: %${finalA}`;
-            colorClass = "win2";
+        if(finalP1 > 50) {
+            resDiv.innerHTML = `🏆 <b>NETIJE: W1 (Öý utar)</b><br>Takyklyk ähtimallygy: %${finalP1}`;
+        } else if(finalP2 > 50) {
+            resDiv.innerHTML = `🏆 <b>NETIJE: W2 (Myhman utar)</b><br>Takyklyk ähtimallygy: %${finalP2}`;
         } else {
-            verdict = `⚖️ <b>PROGNOZ: DEŇLIK (X) ÝA-DA ŞANS</b><br>Oýun gaty deň we kyn geçer. Deňlik ähtimallygy ýokary.`;
-            colorClass = "draw";
+            resDiv.innerHTML = `⚖️ <b>NETIJE: DEŇLIK (X)</b><br>Oýun gaty kyn we deň geçer.`;
         }
-        
-        resDiv.innerHTML = verdict;
-        resDiv.className = "result " + colorClass;
-        resDiv.style.display = "block";
     }
 </script>
-
 </body>
 </html>

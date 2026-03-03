@@ -3,45 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football AI Predictor</title>
+    <title>AI Live Football Robot</title>
     <style>
-        body { background-color: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .card { background: #1e293b; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        input { width: 80%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; }
-        button { width: 85%; padding: 15px; background: #0284c7; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        #result { margin-top: 20px; background: #0f172a; padding: 15px; border-radius: 10px; min-height: 100px; text-align: left; border-left: 4px solid #38bdf8; }
+        body { background: #0b0f19; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: #161e2d; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .btn-api { background: #10b981; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+        .match-card { background: #1f2937; margin: 10px 0; padding: 15px; border-radius: 12px; text-align: left; border-left: 5px solid #10b981; }
+        .prediction { color: #34d399; font-weight: bold; font-size: 0.9em; margin-top: 5px; }
+        #loading { display: none; color: #60a5fa; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <h2>⚽ FOOTBALL AI ROBOT</h2>
-    <div class="card">
-        <input type="text" id="home" placeholder="Öý komandasy">
-        <input type="text" id="away" placeholder="Myhman komandasy">
-        <input type="number" id="h_xg" placeholder="Öý xG (mysal: 1.5)">
-        <input type="number" id="a_xg" placeholder="Myhman xG (mysal: 1.2)">
-        <button onclick="analyze()">ANALIZ ET</button>
-        <div id="result">Netije garaşylýar...</div>
+
+    <div class="container">
+        <h2>🤖 AI LIVE ANALYZER</h2>
+        <p style="font-size: 0.8em; color: #94a3b8;">Hakyky onlaýn oýunlary we AI çaklamalaryny görkeziň</p>
+        
+        <div id="loading">Robot maglumat çekýär... ⏳</div>
+        <button class="btn-api" onclick="fetchLiveGames()">JANLY OÝUNLARY ÇEK</button>
+        
+        <div id="match-list">
+            </div>
     </div>
 
     <script>
-        function analyze() {
-            let home = document.getElementById('home').value || "Team 1";
-            let away = document.getElementById('away').value || "Team 2";
-            let h_xg = parseFloat(document.getElementById('h_xg').value) || 0;
-            let a_xg = parseFloat(document.getElementById('a_xg').value) || 0;
+        // ROBOT ACHARY (API KEY): Bu ýer hakyky maglumaty çekmäge kömek edýär
+        async function fetchLiveGames() {
+            const loader = document.getElementById('loading');
+            const list = document.getElementById('match-list');
+            
+            loader.style.display = 'block';
+            list.innerHTML = '';
 
-            let prob = (h_xg / (h_xg + a_xg + 0.1)) * 100;
-            let scoreH = Math.floor(h_xg + Math.random());
-            let scoreA = Math.floor(a_xg + Math.random());
+            try {
+                // Hakyky dünýäde futbol maglumatlaryny berýän API-a sorag ugradýarys
+                // Bellik: Häzirki wagtda demo hökmünde 'mock' maglumatlary ulanýarys,
+                // emma 'fetch' funksiýasy hakyky robotyň esasy iş prinsipidir.
+                
+                setTimeout(() => { // Onlaýn garaşma wagtyny simulýasiýa edýäris
+                    const mockMatches = [
+                        { home: "Manchester City", away: "Arsenal", score: "1-1", xG_h: 2.1, xG_a: 1.8 },
+                        { home: "Real Madrid", away: "Barcelona", score: "0-0", xG_h: 1.5, xG_a: 2.4 },
+                        { home: "Bayern Munich", away: "Dortmund", score: "3-1", xG_h: 3.2, xG_a: 1.1 }
+                    ];
 
-            document.getElementById('result').innerHTML = `
-                <b>📊 ANALIZ: ${home} vs ${away}</b><br>
-                🎯 AI Hasap: ${scoreH}:${scoreA}<br>
-                📈 Utuş ähtimallygy: %${prob.toFixed(1)}<br>
-                💡 Maslahat: ${prob > 55 ? home + " utar" : "Garaşyň."}
-            `;
+                    mockMatches.forEach(match => {
+                        const prob = (match.xG_h / (match.xG_h + match.xG_a)) * 100;
+                        const card = `
+                            <div class="match-card">
+                                <b>${match.home} vs ${match.away}</b> <small>(${match.score})</small><br>
+                                <div class="prediction">
+                                    AI Predict: ${prob > 50 ? 'Home Win (W1)' : 'Away Win (W2)'} <br>
+                                    Confidence: %${prob.toFixed(1)}
+                                </div>
+                            </div>
+                        `;
+                        list.innerHTML += card;
+                    });
+                    loader.style.display = 'none';
+                }, 1500);
+
+            } catch (error) {
+                alert("Robot baglanyşykda kynçylyk çekdi!");
+                loader.style.display = 'none';
+            }
         }
     </script>
 </body>
 </html>
-

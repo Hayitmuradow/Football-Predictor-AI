@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="tk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football AI Predictor</title>
+    <style>
+        body { background-color: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .card { background: #1e293b; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        input { width: 80%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; }
+        button { width: 85%; padding: 15px; background: #0284c7; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        #result { margin-top: 20px; background: #0f172a; padding: 15px; border-radius: 10px; min-height: 100px; text-align: left; border-left: 4px solid #38bdf8; }
+    </style>
+</head>
+<body>
+    <h2>⚽ FOOTBALL AI ROBOT</h2>
+    <div class="card">
+        <input type="text" id="home" placeholder="Öý komandasy">
+        <input type="text" id="away" placeholder="Myhman komandasy">
+        <input type="number" id="h_xg" placeholder="Öý xG (mysal: 1.5)">
+        <input type="number" id="a_xg" placeholder="Myhman xG (mysal: 1.2)">
+        <button onclick="analyze()">ANALIZ ET</button>
+        <div id="result">Netije garaşylýar...</div>
+    </div>
+
+    <script>
+        function analyze() {
+            let home = document.getElementById('home').value || "Team 1";
+            let away = document.getElementById('away').value || "Team 2";
+            let h_xg = parseFloat(document.getElementById('h_xg').value) || 0;
+            let a_xg = parseFloat(document.getElementById('a_xg').value) || 0;
+
+            let prob = (h_xg / (h_xg + a_xg + 0.1)) * 100;
+            let scoreH = Math.floor(h_xg + Math.random());
+            let scoreA = Math.floor(a_xg + Math.random());
+
+            document.getElementById('result').innerHTML = `
+                <b>📊 ANALIZ: ${home} vs ${away}</b><br>
+                🎯 AI Hasap: ${scoreH}:${scoreA}<br>
+                📈 Utuş ähtimallygy: %${prob.toFixed(1)}<br>
+                💡 Maslahat: ${prob > 55 ? home + " utar" : "Garaşyň."}
+            `;
+        }
+    </script>
+</body>
+</html>
+

@@ -7,33 +7,43 @@
     <style>
         :root { --primary: #38bdf8; --secondary: #10b981; --dark: #0f172a; --card: #1e293b; }
         body { background: var(--dark); color: white; font-family: sans-serif; padding: 15px; }
-        .card { background: var(--card); border-radius: 15px; padding: 20px; border-top: 5px solid var(--primary); }
-        label { display: block; margin: 10px 0 5px; font-size: 0.9em; color: #94a3b8; }
+        .card { background: var(--card); border-radius: 15px; padding: 20px; border-top: 5px solid var(--primary); box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        label { display: block; margin: 10px 0 5px; font-size: 0.85em; color: #94a3b8; }
         input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; background: var(--primary); color: white; margin-top: 20px; font-size: 1.1em; }
-        #res { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; line-height: 1.6; border-left: 5px solid var(--secondary); background: rgba(16, 185, 129, 0.1); }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; background: var(--primary); color: white; margin-top: 20px; font-size: 1.1em; cursor: pointer; }
+        #res { margin-top: 25px; padding: 20px; border-radius: 12px; display: none; line-height: 1.8; border-left: 6px solid var(--secondary); background: rgba(16, 185, 129, 0.1); }
+        .match-title { color: var(--primary); font-weight: bold; font-size: 1.2em; border-bottom: 1px solid #334155; margin-bottom: 10px; padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2 style="text-align:center; color:var(--primary);">⚽ AI ANALYZER PRO</h2>
+    <h2>⚽ AI PRO ANALYZER</h2>
     
-    <label>W1 (Öý koeffisýenti)</label>
-    <input type="number" id="k1" step="0.01" placeholder="1.60">
+    <label>Öý Komandasy (Ady)</label>
+    <input type="text" id="hN" placeholder="Meselem: Real Madrid">
 
-    <label>X (Deňlik koeffisýenti)</label>
-    <input type="number" id="kx" step="0.01" placeholder="3.50">
+    <label>Myhman Komandasy (Ady)</label>
+    <input type="text" id="aN" placeholder="Meselem: Barselona">
 
-    <label>W2 (Myhman koeffisýenti)</label>
-    <input type="number" id="k2" step="0.01" placeholder="4.80">
+    <div style="display: flex; gap: 10px;">
+        <div style="flex: 1;">
+            <label>W1 (Koeffisiýent)</label>
+            <input type="number" id="k1" step="0.01" placeholder="1.80">
+        </div>
+        <div style="flex: 1;">
+            <label>W2 (Koeffisiýent)</label>
+            <input type="number" id="k2" step="0.01" placeholder="3.50">
+        </div>
+    </div>
 
-    <label>Komandanyň Hakyky Ýagdaýy</label>
+    <label>Öý Komandanyň Ýagdaýy</label>
     <select id="status">
-        <option value="1.2">🔥 Öý komanda gaty güýçli (Ruhy belent)</option>
-        <option value="1.0" selected>✅ Kadaly ýagdaý (Durnukly)</option>
-        <option value="0.8">⚠️ Öý ýadow / Myhman has taýýar</option>
-        <option value="0.6">❌ Öýde esasy oýunçylar ýok</option>
+        <option value="1.3">🔥 Gaty güýçli (Esas düzüm, ruhy belent)</option>
+        <option value="1.0" selected>✅ Kadaly (Durnukly oýnaýar)</option>
+        <option value="0.7">⚠️ Ýadow / Şikesler bar</option>
+        <option value="0.4">❌ Ýagdaýy gaty pes</option>
     </select>
 
     <button class="btn" onclick="calc()">ANALIZI GÖR</button>
@@ -43,31 +53,35 @@
 
 <script>
     function calc() {
+        const hName = document.getElementById('hN').value || "Öý komandasy";
+        const aName = document.getElementById('aN').value || "Myhman komandasy";
         const v1 = parseFloat(document.getElementById('k1').value);
-        const vx = parseFloat(document.getElementById('kx').value);
         const v2 = parseFloat(document.getElementById('k2').value);
         const power = parseFloat(document.getElementById('status').value);
         const resDiv = document.getElementById('res');
 
-        if(!v1 || !vx || !v2) { alert("Koeffisýentleri ýazyň!"); return; }
+        if(!v1 || !v2) { alert("Koeffisiýentleri ýazyň!"); return; }
 
-        // Bukmeker ähtimallygy + Seniň "Güýç" faktoryň
+        // Robot logikasy
         let p1 = (1/v1) * 100 * power;
-        let px = (1/vx) * 100;
         let p2 = (1/v2) * 100;
-        let total = p1 + px + p2;
+        let total = p1 + p2;
 
         let finalP1 = ((p1/total)*100).toFixed(1);
         let finalP2 = ((p2/total)*100).toFixed(1);
 
         resDiv.style.display = "block";
-        if(finalP1 > 50) {
-            resDiv.innerHTML = `🏆 <b>NETIJE: W1 (Öý utar)</b><br>Takyklyk ähtimallygy: %${finalP1}`;
-        } else if(finalP2 > 50) {
-            resDiv.innerHTML = `🏆 <b>NETIJE: W2 (Myhman utar)</b><br>Takyklyk ähtimallygy: %${finalP2}`;
+        let resultMsg = `<div class="match-title">${hName} vs ${aName}</div>`;
+
+        if(finalP1 > 55) {
+            resultMsg += `🏆 <b>ROBOTYŇ PROGNOZY: ÝEŇIŞ W1</b><br>Bu oýunda <b>${hName}</b> ýeňiş gazanmaga has golaý.<br>🎯 Ähtimallyk: %${finalP1}`;
+        } else if(finalP2 > 55) {
+            resultMsg += `🏆 <b>ROBOTYŇ PROGNOZY: ÝEŇIŞ W2</b><br>Bu oýunda <b>${aName}</b> ýeňiş gazanar.<br>🎯 Ähtimallyk: %${finalP2}`;
         } else {
-            resDiv.innerHTML = `⚖️ <b>NETIJE: DEŇLIK (X)</b><br>Oýun gaty kyn we deň geçer.`;
+            resultMsg += `⚖️ <b>ROBOTYŇ PROGNOZY: DEŇLIK (X)</b><br>Iki komanda hem deň görkeziji berýär. Şanslar: %${finalP1} - %${finalP2}`;
         }
+        
+        resDiv.innerHTML = resultMsg;
     }
 </script>
 </body>

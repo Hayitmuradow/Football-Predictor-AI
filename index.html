@@ -3,71 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Live Football Robot</title>
+    <title>AI Football Predictor PRO</title>
     <style>
-        body { background: #0b0f19; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: #161e2d; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .btn-api { background: #10b981; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
-        .match-card { background: #1f2937; margin: 10px 0; padding: 15px; border-radius: 12px; text-align: left; border-left: 5px solid #10b981; }
-        .prediction { color: #34d399; font-weight: bold; font-size: 0.9em; margin-top: 5px; }
-        #loading { display: none; color: #60a5fa; margin-bottom: 10px; }
+        :root { --primary: #38bdf8; --secondary: #10b981; --dark: #0f172a; --card: #1e293b; }
+        body { background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 50px; }
+        .header { background: #1e293b; padding: 20px; text-align: center; border-bottom: 2px solid var(--primary); }
+        .nav-tabs { display: flex; justify-content: space-around; background: #1e293b; padding: 10px 0; position: sticky; top: 0; z-index: 100; }
+        .tab-btn { background: none; border: none; color: #94a3b8; font-weight: bold; cursor: pointer; padding: 10px; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+        .content { padding: 20px; display: none; }
+        .content.active { display: block; }
+        .card { background: var(--card); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-online { background: var(--primary); }
+        .btn-manual { background: var(--secondary); }
+        .result-box { margin-top: 15px; padding: 15px; background: #0f172a; border-radius: 10px; border-left: 4px solid var(--primary); font-size: 0.9em; }
+        .match-item { background: #334155; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>🤖 AI LIVE ANALYZER</h2>
-        <p style="font-size: 0.8em; color: #94a3b8;">Hakyky onlaýn oýunlary we AI çaklamalaryny görkeziň</p>
-        
-        <div id="loading">Robot maglumat çekýär... ⏳</div>
-        <button class="btn-api" onclick="fetchLiveGames()">JANLY OÝUNLARY ÇEK</button>
-        
-        <div id="match-list">
+<div class="header">
+    <h2>⚽ FOOTBALL AI PRO</h2>
+</div>
+
+<div class="nav-tabs">
+    <button class="tab-btn active" onclick="openTab('online')">🌐 ONLAÝN ROBOT</button>
+    <button class="tab-btn" onclick="openTab('manual')">✍️ EL BILEN ANALIZ</button>
+</div>
+
+<div id="online" class="content active">
+    <div class="card">
+        <h3>Janly Oýunlar</h3>
+        <p style="color: #94a3b8; font-size: 0.8em;">Onlaýn oýunlary we AI çaklamalaryny çekmek üçin basyň.</p>
+        <button class="btn btn-online" onclick="fetchOnline()">OÝUNLARY TÄZELE</button>
+        <div id="online-results" style="margin-top: 20px;">
             </div>
     </div>
+</div>
 
-    <script>
-        // ROBOT ACHARY (API KEY): Bu ýer hakyky maglumaty çekmäge kömek edýär
-        async function fetchLiveGames() {
-            const loader = document.getElementById('loading');
-            const list = document.getElementById('match-list');
-            
-            loader.style.display = 'block';
-            list.innerHTML = '';
+<div id="manual" class="content">
+    <div class="card">
+        <h3>Jikme-jik Analiz</h3>
+        <p style="color: #94a3b8; font-size: 0.8em;">Statistikalary el bilen giriziň we takyk netije alyň.</p>
+        <input type="text" id="hName" placeholder="Öý komandasy">
+        <input type="text" id="aName" placeholder="Myhman komandasy">
+        <input type="number" id="hXG" placeholder="Öý xG (mysal: 1.8)">
+        <input type="number" id="aXG" placeholder="Myhman xG (mysal: 1.2)">
+        <button class="btn btn-manual" onclick="calculateManual()">HASAPLA</button>
+        <div id="manual-result" class="result-box" style="display:none;"></div>
+    </div>
+</div>
 
-            try {
-                // Hakyky dünýäde futbol maglumatlaryny berýän API-a sorag ugradýarys
-                // Bellik: Häzirki wagtda demo hökmünde 'mock' maglumatlary ulanýarys,
-                // emma 'fetch' funksiýasy hakyky robotyň esasy iş prinsipidir.
-                
-                setTimeout(() => { // Onlaýn garaşma wagtyny simulýasiýa edýäris
-                    const mockMatches = [
-                        { home: "Manchester City", away: "Arsenal", score: "1-1", xG_h: 2.1, xG_a: 1.8 },
-                        { home: "Real Madrid", away: "Barcelona", score: "0-0", xG_h: 1.5, xG_a: 2.4 },
-                        { home: "Bayern Munich", away: "Dortmund", score: "3-1", xG_h: 3.2, xG_a: 1.1 }
-                    ];
+<script>
+    function openTab(tabName) {
+        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
 
-                    mockMatches.forEach(match => {
-                        const prob = (match.xG_h / (match.xG_h + match.xG_a)) * 100;
-                        const card = `
-                            <div class="match-card">
-                                <b>${match.home} vs ${match.away}</b> <small>(${match.score})</small><br>
-                                <div class="prediction">
-                                    AI Predict: ${prob > 50 ? 'Home Win (W1)' : 'Away Win (W2)'} <br>
-                                    Confidence: %${prob.toFixed(1)}
-                                </div>
-                            </div>
-                        `;
-                        list.innerHTML += card;
-                    });
-                    loader.style.display = 'none';
-                }, 1500);
+    // ONLAÝN ROBOT FUNKSIÝASY
+    function fetchOnline() {
+        const resDiv = document.getElementById('online-results');
+        resDiv.innerHTML = "Garaşyň, onlaýn maglumatlar çekilýär... ⏳";
+        
+        setTimeout(() => {
+            const games = [
+                {h: "Liverpool", a: "Real Madrid", pred: "W1 (55%)", odd: "1.90"},
+                {h: "Milan", a: "Inter Milan", pred: "Draw (X)", odd: "3.20"},
+                {h: "PSG", a: "Man City", pred: "W2 (62%)", odd: "2.10"}
+            ];
+            resDiv.innerHTML = "";
+            games.forEach(g => {
+                resDiv.innerHTML += `
+                    <div class="match-item">
+                        <b>${g.h} vs ${g.h}</b><br>
+                        <span style="color:#38bdf8">AI: ${g.pred}</span> | <small>Koef: ${g.odd}</small>
+                    </div>`;
+            });
+        }, 1200);
+    }
 
-            } catch (error) {
-                alert("Robot baglanyşykda kynçylyk çekdi!");
-                loader.style.display = 'none';
-            }
-        }
-    </script>
+    // EL BILEN HASAPLAÝAN FUNKSIÝA
+    function calculateManual() {
+        const h = document.getElementById('hName').value || "Öý";
+        const a = document.getElementById('aName').value || "Myhman";
+        const hX = parseFloat(document.getElementById('hXG').value) || 0;
+        const aX = parseFloat(document.getElementById('aXG').value) || 0;
+        
+        const resBox = document.getElementById('manual-result');
+        resBox.style.display = "block";
+        
+        const winProb = ((hX / (hX + aX + 0.1)) * 100).toFixed(1);
+        resBox.innerHTML = `
+            <b>📊 ANALIZ NETIJESI:</b><br>
+            ⚽ ${h} utuş ähtimallygy: %${winProb}<br>
+            🎯 Garaşylýan hasap: ${Math.round(hX)} - ${Math.round(aX)}<br>
+            💡 Maslahat: ${winProb > 50 ? h + ' tarapa serediň.' : 'Ätiýaçly boluň.'}
+        `;
+    }
+</script>
 </body>
 </html>

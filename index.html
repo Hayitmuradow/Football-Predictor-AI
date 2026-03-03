@@ -3,26 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Football Robot PRO</title>
+    <title>AI Robot PRO - Stable</title>
     <style>
         :root { --primary: #38bdf8; --secondary: #10b981; --dark: #0f172a; --card: #1e293b; }
         body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; padding-bottom: 50px; }
-        .header { background: #1e293b; padding: 15px; text-align: center; border-bottom: 2px solid var(--primary); }
-        .nav-tabs { display: flex; background: #1e293b; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #334155; }
-        .tab-btn { flex: 1; background: none; border: none; color: #94a3b8; padding: 15px; cursor: pointer; font-weight: bold; border-bottom: 3px solid transparent; }
+        .nav-tabs { display: flex; background: #1e293b; position: sticky; top: 0; border-bottom: 1px solid #334155; }
+        .tab-btn { flex: 1; background: none; border: none; color: #94a3b8; padding: 15px; cursor: pointer; font-weight: bold; }
         .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
         .content { padding: 15px; display: none; }
         .content.active { display: block; }
-        .card { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .card { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 5px solid var(--primary); }
         input { width: 95%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; background: var(--primary); }
-        .match-card { background: #334155; padding: 12px; border-radius: 10px; margin-bottom: 12px; border-left: 5px solid var(--primary); }
-        .time-box { font-size: 0.8em; color: #94a3b8; margin: 8px 0; background: #0f172a; padding: 8px; border-radius: 6px; line-height: 1.5; }
+        .match-card { background: #334155; padding: 12px; border-radius: 10px; margin-bottom: 12px; border-left: 4px solid var(--primary); }
+        .time-box { font-size: 0.8em; color: #94a3b8; margin: 5px 0; }
     </style>
 </head>
 <body>
-
-<div class="header"><h2>⚽ AI ROBOT PRO</h2></div>
 
 <div class="nav-tabs">
     <button class="tab-btn active" onclick="openTab('online')">🌐 ONLAÝN</button>
@@ -32,46 +29,48 @@
 <div id="online" class="content active">
     <div class="card">
         <h3>Janly Oýunlar</h3>
-        <button class="btn" onclick="fetchLiveMatches()">OÝUNLARY TÄZELE</button>
-        <div id="loading" style="display:none; text-align:center; margin:15px;">Maglumat çekilýär... ⏳</div>
-        <div id="match-list" style="margin-top: 20px;"></div>
+        <button class="btn" onclick="fetchLiveMatches()">OÝUNLARY GÖR</button>
+        <div id="loading" style="display:none; text-align:center; margin:15px;">🔍 Robot gözleýär...</div>
+        <div id="match-list" style="margin-top: 15px;"></div>
     </div>
 </div>
 
 <div id="manual" class="content">
     <div class="card">
-        <h3>Jikme-jik Hasaplaýyş</h3>
-        <input type="text" id="hName" placeholder="Öý komandasy">
-        <input type="text" id="aName" placeholder="Myhman komandasy">
-        <input type="number" id="hXG" placeholder="Öý xG">
-        <input type="number" id="aXG" placeholder="Myhman xG">
-        <button class="btn" style="background:var(--secondary);" onclick="calculateManual()">HASAPLA</button>
-        <div id="manual-result" style="margin-top:20px; padding:15px; background:#0f172a; border-radius:10px; display:none; border-left: 4px solid var(--secondary);"></div>
+        <h3>El bilen Analiz</h3>
+        <input type="text" id="hN" placeholder="Öý komandasy">
+        <input type="text" id="aN" placeholder="Myhman komandasy">
+        <input type="number" id="hX" placeholder="Öý xG">
+        <input type="number" id="aX" placeholder="Myhman xG">
+        <button class="btn" style="background:var(--secondary);" onclick="calcManual()">HASAPLA</button>
+        <div id="resManual" style="margin-top:15px; padding:10px; background:#0f172a; border-radius:8px; display:none;"></div>
     </div>
 </div>
 
 <script>
-    function openTab(tabId) {
+    function openTab(t) {
         document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
+        document.getElementById(t).classList.add('active');
         event.currentTarget.classList.add('active');
     }
 
     async function fetchLiveMatches() {
         const list = document.getElementById('match-list');
         const loader = document.getElementById('loading');
-        // Proxy ulanýarys, sebäbi göni baglanyşykda CORS päpese bolup biler
-        const url = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://api.football-data.org/v4/matches');
+        // Proxy kynçylyk berýän bolsa, göni baglanmaga synanyşýarys
         const apiKey = 'b622ef1831d04997955869882fa1822d';
 
         loader.style.display = 'block';
         list.innerHTML = '';
 
         try {
-            const res = await fetch(url);
-            const rawData = await res.json();
-            const data = JSON.parse(rawData.contents);
+            const res = await fetch('https://api.football-data.org/v4/matches', {
+                headers: { 'X-Auth-Token': apiKey }
+            });
+            
+            if (!res.ok) throw new Error('API Error');
+            const data = await res.json();
 
             if (data.matches && data.matches.length > 0) {
                 data.matches.slice(0, 10).forEach(m => {
@@ -83,20 +82,24 @@
                         <div style="color:var(--secondary); font-weight:bold;">AI: ${Math.random() > 0.5 ? 'W1' : 'W2'}</div>
                     </div>`;
                 });
-            } else { list.innerHTML = "Şu wagt uly ligalarda oýun tapylmady."; }
+            } else {
+                list.innerHTML = "Şu wagt mugt ligalarda oýun ýok. 'EL BILEN' bölümini ulanmagy dowam ediň.";
+            }
         } catch (e) {
-            list.innerHTML = "Onlaýn robot wagtlaýynça ýapyk ýa-da API limiti doldy. EL BILEN bölümi ulanmagy dowam ediň.";
-        } finally { loader.style.display = 'none'; }
+            list.innerHTML = "Onlaýn ulgamda wagtlaýynça bökdençlik bar. Lütfün, aşaky düwmä geçip 'EL BILEN' hasaplatyň.";
+        } finally {
+            loader.style.display = 'none';
+        }
     }
 
-    function calculateManual() {
-        const h = document.getElementById('hName').value || "Öý";
-        const hx = parseFloat(document.getElementById('hXG').value) || 0;
-        const ax = parseFloat(document.getElementById('aXG').value) || 0;
-        const resDiv = document.getElementById('manual-result');
-        resDiv.style.display = "block";
-        const winProb = ((hx / (hx + ax + 0.1)) * 100).toFixed(1);
-        resDiv.innerHTML = `⚽ ${h} utuş ähtimallygy: %${winProb}<br>🎯 AI Hasap: ${Math.round(hx)} - ${Math.round(ax)}`;
+    function calcManual() {
+        const h = document.getElementById('hN').value || "Öý";
+        const hx = parseFloat(document.getElementById('hX').value) || 0;
+        const ax = parseFloat(document.getElementById('aX').value) || 0;
+        const res = document.getElementById('resManual');
+        res.style.display = "block";
+        const win = ((hx / (hx + ax + 0.1)) * 100).toFixed(1);
+        res.innerHTML = `⚽ ${h} utuş ähtimallygy: %${win}<br>🎯 Hasap: ${Math.round(hx)} - ${Math.round(ax)}`;
     }
 </script>
 </body>

@@ -5,52 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI PRO ANALYZER</title>
     <style>
-        :root { --primary: #38bdf8; --secondary: #10b981; --dark: #0f172a; --card: #1e293b; --accent: #f59e0b; }
+        :root { --primary: #38bdf8; --secondary: #10b981; --dark: #0f172a; --card: #1e293b; }
         body { background: var(--dark); color: white; font-family: sans-serif; padding: 15px; }
-        .card { background: var(--card); border-radius: 15px; padding: 20px; border-top: 4px solid var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        .card { background: var(--card); border-radius: 15px; padding: 20px; border-top: 4px solid var(--primary); }
         .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 0.8em; color: #94a3b8; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; font-size: 1em; }
-        #result { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; line-height: 1.6; }
-        .win { border-left: 5px solid var(--secondary); background: rgba(16, 185, 129, 0.1); }
-        .draw { border-left: 5px solid var(--accent); background: rgba(245, 158, 11, 0.1); }
-        .loss { border-left: 5px solid #f87171; background: rgba(248, 113, 113, 0.1); }
+        label { display: block; margin-bottom: 5px; font-size: 0.85em; color: #94a3b8; }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; font-size: 1em; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; margin-top: 10px; }
+        #result { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; line-height: 1.6; border-left: 5px solid var(--secondary); background: rgba(16, 185, 129, 0.1); }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>⚽ AI PRO ANALYZER</h2>
+    <h2 style="text-align:center; color:var(--primary);">⚽ AI ANALYZER V2</h2>
     
     <div class="input-group">
-        <label>Öý Komandasy (Meselem: Real)</label>
-        <input type="text" id="hN" placeholder="Ady">
+        <label>Öý Komandasy</label>
+        <input type="text" id="hN" placeholder="Komandanyň ady">
     </div>
 
     <div class="input-group">
-        <label>Myhman Komandasy (Meselem: Barsa)</label>
-        <input type="text" id="aN" placeholder="Ady">
+        <label>Öý Komandanyň Ýagdaýy</label>
+        <select id="hStatus">
+            <option value="10">🔥 Gaty güýçli (Hemme oýunçy bar, ruhy belent)</option>
+            <option value="7" selected>✅ Kadaly (Durnukly oýnaýar)</option>
+            <option value="4">⚠️ Ýadow (Esasy oýunçysy ýok ýa-da yzly-yzyna oýun bar)</option>
+            <option value="2">❌ Gaty pes (Trawmalar kän, keýpi ýok)</option>
+        </select>
     </div>
 
-    <div style="display: flex; gap: 10px;">
-        <div class="input-group">
-            <label>Öý Koeffisiýent</label>
-            <input type="number" id="hK" step="0.01" placeholder="1.80">
-        </div>
-        <div class="input-group">
-            <label>Myhman Koef.</label>
-            <input type="number" id="aK" step="0.01" placeholder="3.20">
-        </div>
+    <hr style="border: 0.5px solid #334155; margin: 20px 0;">
+
+    <div class="input-group">
+        <label>Myhman Komandasy</label>
+        <input type="text" id="aN" placeholder="Komandanyň ady">
     </div>
 
     <div class="input-group">
-        <label>Komandalaryň Gerekli Güýji (1-10 aralyk)</label>
-        <input type="number" id="hP" placeholder="Öý güýji (Kubok/Forma)">
+        <label>Myhman Komandanyň Ýagdaýy</label>
+        <select id="aStatus">
+            <option value="10">🔥 Gaty güýçli (Hemme oýunçy bar)</option>
+            <option value="7" selected>✅ Kadaly (Durnukly oýnaýar)</option>
+            <option value="4">⚠️ Ýadow (Esasy oýunçysy ýok)</option>
+            <option value="2">❌ Gaty pes (Ýagdaýy ýaramaz)</option>
+        </select>
     </div>
 
-    <button class="btn" onclick="analyzeMatch()">ROBOTYŇ NETIJESINI GÖR</button>
+    <button class="btn" onclick="analyzeMatch()">PROGNOZY GÖR</button>
 
     <div id="result"></div>
 </div>
@@ -59,33 +61,26 @@
     function analyzeMatch() {
         const hName = document.getElementById('hN').value || "Öý komandasy";
         const aName = document.getElementById('aN').value || "Myhman komandasy";
-        const hCoef = parseFloat(document.getElementById('hK').value) || 2.0;
-        const aCoef = parseFloat(document.getElementById('aK').value) || 2.0;
-        const hPower = parseFloat(document.getElementById('hP').value) || 5;
+        const hVal = parseInt(document.getElementById('hStatus').value);
+        const aVal = parseInt(document.getElementById('aStatus').value);
         
         const resDiv = document.getElementById('result');
         resDiv.style.display = "block";
         
-        // Robot logikasy: Koeffisiýent we güýç birleşmesi
-        let hScore = (1 / hCoef) * 100 + (hPower * 2);
-        let aScore = (1 / aCoef) * 100;
-        
-        let verdict = "";
-        let styleClass = "";
-        
-        if (hScore > aScore + 15) {
-            verdict = `🔥 <b>ROBOTYŇ NETIJESI:</b> <br>Bu oýunda <b>${hName}</b> ýeňiş gazanmaly (W1). <br>Ähtimallyk: %${Math.min(90, hScore.toFixed(1))}`;
-            styleClass = "win";
-        } else if (aScore > hScore + 15) {
-            verdict = `🔥 <b>ROBOTYŇ NETIJESI:</b> <br>Bu oýunda <b>${aName}</b> ýeňiş gazanar (W2). <br>Ähtimallyk: %${Math.min(90, aScore.toFixed(1))}`;
-            styleClass = "loss";
+        let msg = "";
+        let winChance = 0;
+
+        if (hVal > aVal) {
+            winChance = 50 + (hVal - aVal) * 4;
+            msg = `🎯 <b>AI Netijesi:</b> <br>Bu oýunda <b>${hName}</b> utmaga has golaý (W1). <br>Utuş ähtimallygy: %${winChance}`;
+        } else if (aVal > hVal) {
+            winChance = 50 + (aVal - hVal) * 4;
+            msg = `🎯 <b>AI Netijesi:</b> <br>Bu oýunda <b>${aName}</b> utmaga has golaý (W2). <br>Utuş ähtimallygy: %${winChance}`;
         } else {
-            verdict = `⚖️ <b>ROBOTYŇ NETIJESI:</b> <br>Oýun gaty deň geçýär. <b>Deňme-deň (X)</b> ýa-da "Gerekli Güýji" ýokary bolan tarap azajyk öňe saýlanar.`;
-            styleClass = "draw";
+            msg = `⚖️ <b>AI Netijesi:</b> <br>Iki komandanyň hem ýagdaýy meňzeş. <b>Deňlik (X)</b> bolmagy has ähtimal ýa-da öz meýdançasynda oýnaýan komanda azajyk öňe saýlanar.`;
         }
         
-        resDiv.innerHTML = verdict;
-        resDiv.className = styleClass;
+        resDiv.innerHTML = msg;
     }
 </script>
 

@@ -3,92 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI ROBOT PRO - Hybrid Edition</title>
+    <title>AI ROBOT PRO - Full Fix</title>
     <style>
         :root { --primary: #38bdf8; --secondary: #10b981; --dark: #0f172a; --card: #1e293b; }
-        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; overflow-x: hidden; }
-        .nav-tabs { display: flex; background: #1e293b; position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid var(--primary); }
-        .tab-btn { flex: 1; background: none; border: none; color: #94a3b8; padding: 15px; cursor: pointer; font-weight: bold; }
-        .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
-        .content { display: none; padding: 15px; }
-        .content.active { display: block; }
-        iframe { width: 100%; height: 80vh; border: none; border-radius: 10px; background: white; }
-        .card { background: var(--card); border-radius: 15px; padding: 20px; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0 15px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; background: var(--primary); color: white; cursor: pointer; }
-        #res { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; background: rgba(16, 185, 129, 0.1); border-left: 5px solid var(--secondary); }
+        body { background: var(--dark); color: white; font-family: sans-serif; padding: 15px; margin: 0; }
+        .card { background: var(--card); border-radius: 15px; padding: 20px; border-top: 5px solid var(--primary); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: var(--primary); font-size: 1.4em; margin-bottom: 20px; }
+        
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-size: 0.85em; color: #94a3b8; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; font-size: 1em; }
+        
+        .row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .row > div { flex: 1; }
+
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: bold; background: var(--primary); color: white; font-size: 1.1em; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn:active { transform: scale(0.97); }
+
+        #res { margin-top: 25px; padding: 18px; border-radius: 12px; display: none; line-height: 1.7; border-left: 6px solid var(--secondary); background: rgba(16, 185, 129, 0.1); }
+        .match-title { color: var(--primary); font-size: 1.2em; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
-<div class="nav-tabs">
-    <button class="tab-btn active" onclick="openTab('online')">🌐 ONLAÝN OÝUNLAR</button>
-    <button class="tab-btn" onclick="openTab('manual')">✍️ ROBOT ANALIZ</button>
-</div>
-
-<div id="online" class="content active">
-    <div style="margin-bottom: 10px; font-size: 0.8em; color: #94a3b8;">
-        💡 Şu ýerden oýun we kofisýent saýlap, "ROBOT ANALIZ" bölüminde hasapladyň.
-    </div>
-    <iframe src="https://m.flashscore.com/"></iframe>
-</div>
-
-<div id="manual" class="content">
-    <div class="card">
-        <h3>🤖 AI Robot Analyzer</h3>
-        
-        <label>Öý Komandasy (W1)</label>
+<div class="card">
+    <h2>🤖 AI ANALYZER PRO</h2>
+    
+    <div class="input-group">
+        <label>Öý Komandasy</label>
         <input type="text" id="hN" placeholder="Meselem: Real Madrid">
-        
-        <label>W1 Kofisýent</label>
-        <input type="number" id="k1" step="0.01" placeholder="1.80">
-
-        <label>W2 Kofisýent</label>
-        <input type="number" id="k2" step="0.01" placeholder="3.50">
-
-        <label>Komandanyň Ýagdaýy (Pari-däki maglumata görä)</label>
-        <select id="status">
-            <option value="1.3">🔥 Öý eýesi gaty güýçli (Esas düzüm)</option>
-            <option value="1.0" selected>✅ Iki tarap hem kadaly</option>
-            <option value="0.7">⚠️ Öý ýadow / Myhman has taýýar</option>
-        </select>
-
-        <button class="btn" onclick="calc()">HASAPLA WE PROGNOZ BER</button>
-
-        <div id="res"></div>
     </div>
+
+    <div class="input-group">
+        <label>Myhman Komandasy</label>
+        <input type="text" id="aN" placeholder="Meselem: Barselona">
+    </div>
+
+    <div class="row">
+        <div>
+            <label>W1 Kofisýent</label>
+            <input type="number" id="k1" step="0.01" placeholder="1.85">
+        </div>
+        <div>
+            <label>W2 Kofisýent</label>
+            <input type="number" id="k2" step="0.01" placeholder="3.20">
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Öý Komandanyň Ýagdaýy (Pari-kara)</label>
+        <select id="status">
+            <option value="1.3">🔥 Gaty güýçli (Ruhy belent)</option>
+            <option value="1.0" selected>✅ Kadaly (Durnukly)</option>
+            <option value="0.7">⚠️ Ýadow / Esasy oýunçy ýok</option>
+            <option value="0.4">❌ Ýagdaýy gaty pes</option>
+        </select>
+    </div>
+
+    <button class="btn" onclick="calc()">HASAPLA WE PROGNOZY GÖR</button>
+
+    <div id="res"></div>
 </div>
 
 <script>
-    function openTab(t) {
-        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(t).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
-
     function calc() {
         const hName = document.getElementById('hN').value || "Öý komandasy";
+        const aName = document.getElementById('aN').value || "Myhman komandasy";
         const v1 = parseFloat(document.getElementById('k1').value);
         const v2 = parseFloat(document.getElementById('k2').value);
         const power = parseFloat(document.getElementById('status').value);
         const resDiv = document.getElementById('res');
 
-        if(!v1 || !v2) { alert("Kofisýentleri ýazyň!"); return; }
+        if(!v1 || !v2) { 
+            alert("Lütfün, kofisýentleri giriziň!"); 
+            return; 
+        }
 
+        // Analiz Logikasy
         let p1 = (1/v1) * 100 * power;
         let p2 = (1/v2) * 100;
         let total = p1 + p2;
         let finalP1 = ((p1/total)*100).toFixed(1);
+        let finalP2 = (100 - finalP1).toFixed(1);
 
         resDiv.style.display = "block";
-        if(finalP1 > 55) {
-            resDiv.innerHTML = `🏆 <b>ROBOT: ÝEŇIŞ W1</b><br><b>${hName}</b> utmaga has golaý.<br>🎯 Ähtimallyk: %${finalP1}`;
-        } else if(finalP1 < 45) {
-            resDiv.innerHTML = `🏆 <b>ROBOT: ÝEŇIŞ W2</b><br>Myhman komanda has şansly.<br>🎯 Ähtimallyk: %${(100 - finalP1).toFixed(1)}`;
+        let msg = `<div class="match-title">${hName} vs ${aName}</div>`;
+
+        if(finalP1 > 57) {
+            msg += `🏆 <b>ROBOTYŇ NETIJESI: W1</b><br>Bu oýunda <b>${hName}</b> ýeňiş gazanar.<br>🎯 Ähtimallyk: %${finalP1}`;
+            resDiv.style.borderLeftColor = "#10b981";
+        } else if(finalP2 > 57) {
+            msg += `🏆 <b>ROBOTYŇ NETIJESI: W2</b><br>Bu oýunda <b>${aName}</b> ýeňiş gazanar.<br>🎯 Ähtimallyk: %${finalP2}`;
+            resDiv.style.borderLeftColor = "#f87171";
         } else {
-            resDiv.innerHTML = `⚖️ <b>ROBOT: DEŇLIK (X)</b><br>Oýun gaty deň geçer.`;
+            msg += `⚖️ <b>ROBOTYŇ NETIJESI: DEŇLIK (X)</b><br>Oýun deňe-deň geçer ýa-da gaty kyn bolar.<br>📊 W1: %${finalP1} | W2: %${finalP2}`;
+            resDiv.style.borderLeftColor = "#f59e0b";
         }
+        
+        resDiv.innerHTML = msg;
     }
 </script>
 

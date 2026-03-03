@@ -3,74 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Live Predictor - Time Edition</title>
+    <title>AI Football Robot PRO - Full Edition</title>
     <style>
         :root { --primary: #38bdf8; --secondary: #10b981; --dark: #0f172a; --card: #1e293b; }
-        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; padding: 15px; }
-        .match-card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary); }
-        .team-name { font-size: 1.1em; font-weight: bold; color: #f8fafc; }
-        .time-box { background: #0f172a; padding: 8px; border-radius: 8px; margin: 10px 0; font-size: 0.85em; color: #94a3b8; line-height: 1.6; }
-        .prediction { color: var(--secondary); font-weight: bold; margin-top: 5px; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; }
-        #loading { display: none; text-align: center; margin-bottom: 10px; color: var(--primary); }
+        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; padding-bottom: 50px; }
+        .header { background: #1e293b; padding: 15px; text-align: center; border-bottom: 2px solid var(--primary); }
+        .nav-tabs { display: flex; background: #1e293b; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #334155; }
+        .tab-btn { flex: 1; background: none; border: none; color: #94a3b8; padding: 15px; cursor: pointer; font-weight: bold; border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+        .content { padding: 15px; display: none; }
+        .content.active { display: block; }
+        .card { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        input { width: 95%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; background: var(--primary); }
+        .match-card { background: #334155; padding: 12px; border-radius: 10px; margin-bottom: 12px; border-left: 5px solid var(--primary); }
+        .time-box { font-size: 0.8em; color: #94a3b8; margin: 8px 0; background: #0f172a; padding: 8px; border-radius: 6px; line-height: 1.5; }
+        .prediction-text { color: var(--secondary); font-weight: bold; font-size: 0.9em; }
     </style>
 </head>
 <body>
 
-<h2 style="text-align:center;">⚽ AI ROBOT ANALYZER</h2>
+<div class="header">
+    <h2 style="margin:0;">⚽ AI ROBOT PRO</h2>
+</div>
 
-<div id="loading">Maglumatlar we sagatlar hasaplanýar... ⏳</div>
-<button class="btn" onclick="fetchLiveMatches()">OÝUNLARY WE WAGTLARY GÖR</button>
+<div class="nav-tabs">
+    <button class="tab-btn active" onclick="openTab('online')">🌐 ONLAÝN</button>
+    <button class="tab-btn" onclick="openTab('manual')">✍️ EL BILEN</button>
+</div>
 
-<div id="match-list" style="margin-top: 20px;">
+<div id="online" class="content active">
+    <div class="card">
+        <h3>Janly Oýunlar</h3>
+        <p style="color:#94a3b8; font-size:0.8em;">Mugt ligalardaky oýunlary çekmek üçin basyň.</p>
+        <button class="btn" onclick="fetchLiveMatches()">OÝUNLARY TÄZELE</button>
+        <div id="loading" style="display:none; text-align:center; margin:15px;">Robot maglumat çekýär... ⏳</div>
+        <div id="match-list" style="margin-top: 20px;"></div>
     </div>
+</div>
+
+<div id="manual" class="content">
+    <div class="card">
+        <h3>Jikme-jik Hasaplaýyş</h3>
+        <p style="color:#94a3b8; font-size:0.8em;">Öz statistikaňyzy giriziň we takyk netije alyň.</p>
+        <input type="text" id="hName" placeholder="Öý komandasy">
+        <input type="text" id="aName" placeholder="Myhman komandasy">
+        <input type="number" id="hXG" placeholder="Öý xG (mysal: 1.8)">
+        <input type="number" id="aXG" placeholder="Myhman xG (mysal: 1.2)">
+        <button class="btn" style="background:var(--secondary);" onclick="calculateManual()">HASAPLA</button>
+        <div id="manual-result" style="margin-top:20px; padding:15px; background:#0f172a; border-radius:10px; display:none; border-left: 4px solid var(--secondary);"></div>
+    </div>
+</div>
 
 <script>
+    // Tab geçiş funksiýasy
+    function openTab(tabId) {
+        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // ONLAÝN ROBOT FUNKSIÝASY
     async function fetchLiveMatches() {
         const list = document.getElementById('match-list');
         const loader = document.getElementById('loading');
-        const apiKey = 'b622ef1831d04997955869882fa1822d';
+        // Seniň şahsy açaryň
+        const apiKey = 'b622ef1831d04997955869882fa1822d'; 
 
         loader.style.display = 'block';
         list.innerHTML = '';
 
         try {
-            const response = await fetch('https://api.football-data.org/v4/matches', {
+            const res = await fetch('https://api.football-data.org/v4/matches', {
                 headers: { 'X-Auth-Token': apiKey }
             });
-            const data = await response.json();
+            const data = await res.json();
 
             if (data.matches && data.matches.length > 0) {
-                data.matches.slice(0, 15).forEach(match => {
-                    const utcDate = new Date(match.utcDate);
-
-                    // 🇹🇲 Türkmenistan wagty (UTC +5)
-                    const tkmTime = new Date(utcDate.getTime() + (5 * 60 * 60 * 1000));
-                    // 🇹🇷 Türkiýe wagty (UTC +3)
-                    const trTime = new Date(utcDate.getTime() + (3 * 60 * 60 * 1000));
-
-                    const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-
+                data.matches.slice(0, 15).forEach(m => {
+                    const utc = new Date(m.utcDate);
+                    // TKM (UTC+5) we TR (UTC+3) sagat öwrüjisi
+                    const tkm = new Date(utc.getTime() + (5 * 3600000));
+                    const tr = new Date(utc.getTime() + (3 * 3600000));
+                    
+                    const pText = Math.random() > 0.5 ? 'AI Maslahat: W1 (Öý)' : 'AI Maslahat: W2 (Myhman)';
+                    
                     list.innerHTML += `
                         <div class="match-card">
-                            <div class="team-name">${match.homeTeam.name} vs ${match.awayTeam.name}</div>
+                            <b style="font-size:1em;">${m.homeTeam.name} vs ${m.awayTeam.name}</b>
                             <div class="time-box">
-                                📅 Çislo: ${utcDate.toLocaleDateString('tk-TM')}<br>
-                                🇹🇲 TKM Sagat: ${tkmTime.getUTCHours().toString().padStart(2, '0')}:${tkmTime.getUTCMinutes().toString().padStart(2, '0')}<br>
-                                🇹🇷 TR Sagat: ${trTime.getUTCHours().toString().padStart(2, '0')}:${trTime.getUTCMinutes().toString().padStart(2, '0')}
+                                📅 Sene: ${utc.toLocaleDateString('tk-TM')}<br>
+                                🇹🇲 TKM Sagat: ${tkm.getUTCHours().toString().padStart(2,'0')}:${tkm.getUTCMinutes().toString().padStart(2,'0')}<br>
+                                🇹🇷 TR Sagat: ${tr.getUTCHours().toString().padStart(2,'0')}:${tr.getUTCMinutes().toString().padStart(2,'0')}
                             </div>
-                            <div class="prediction">AI Çaklama: ${Math.random() > 0.5 ? 'W1' : 'W2'}</div>
-                        </div>
-                    `;
+                            <div class="prediction-text">${pText}</div>
+                        </div>`;
                 });
             } else {
-                list.innerHTML = "Häzirki wagtda onlaýn oýun tapylmady.";
+                list.innerHTML = "<p style='text-align:center;'>Şu wagt onlaýn oýun tapylmady. Mugt plan diňe 12 sany uly ligany görkezýär.</p>";
             }
-        } catch (error) {
-            list.innerHTML = "Internet baglanyşygyňyzy barlaň ýa-da API limitine serediň.";
+        } catch (e) {
+            list.innerHTML = "<p style='color:#f87171;'>Baglanyşyk ýalňyşlygy! Internetiňizi barlaň.</p>";
         } finally {
             loader.style.display = 'none';
         }
+    }
+
+    // EL BILEN HASAPLAÝYŞ FUNKSIÝASY
+    function calculateManual() {
+        const h = document.getElementById('hName').value || "Öý";
+        const a = document.getElementById('aName').value || "Myhman";
+        const hx = parseFloat(document.getElementById('hXG').value) || 0;
+        const ax = parseFloat(document.getElementById('aXG').value) || 0;
+        const resDiv = document.getElementById('manual-result');
+
+        if (hx === 0 && ax === 0) {
+            alert("Sanalary giriziň!");
+            return;
+        }
+
+        resDiv.style.display = "block";
+        const winProb = ((hx / (hx + ax + 0.1)) * 100).toFixed(1);
+        
+        resDiv.innerHTML = `
+            <b style="color:var(--secondary);">📊 ANALIZ NETIJESI:</b><br>
+            ⚽ ${h} utuş ähtimallygy: %${winProb}<br>
+            🎯 Garaşylýan hasap: ${Math.round(hx)} - ${Math.round(ax)}<br>
+            💡 Maslahat: ${winProb > 50 ? h + ' tarapa serediň.' : 'Deňlik ýa-da ' + a + ' ähtimallygy bar.'}
+        `;
     }
 </script>
 

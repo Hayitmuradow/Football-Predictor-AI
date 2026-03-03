@@ -3,104 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Robot PRO - Stable</title>
+    <title>AI PRO ANALYZER</title>
     <style>
-        :root { --primary: #38bdf8; --secondary: #10b981; --dark: #0f172a; --card: #1e293b; }
-        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; padding-bottom: 50px; }
-        .nav-tabs { display: flex; background: #1e293b; position: sticky; top: 0; border-bottom: 1px solid #334155; }
-        .tab-btn { flex: 1; background: none; border: none; color: #94a3b8; padding: 15px; cursor: pointer; font-weight: bold; }
-        .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
-        .content { padding: 15px; display: none; }
-        .content.active { display: block; }
-        .card { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 5px solid var(--primary); }
-        input { width: 95%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; background: var(--primary); }
-        .match-card { background: #334155; padding: 12px; border-radius: 10px; margin-bottom: 12px; border-left: 4px solid var(--primary); }
-        .time-box { font-size: 0.8em; color: #94a3b8; margin: 5px 0; }
+        :root { --primary: #38bdf8; --secondary: #10b981; --dark: #0f172a; --card: #1e293b; --accent: #f59e0b; }
+        body { background: var(--dark); color: white; font-family: sans-serif; padding: 15px; }
+        .card { background: var(--card); border-radius: 15px; padding: 20px; border-top: 4px solid var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.8em; color: #94a3b8; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; font-size: 1em; }
+        #result { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; line-height: 1.6; }
+        .win { border-left: 5px solid var(--secondary); background: rgba(16, 185, 129, 0.1); }
+        .draw { border-left: 5px solid var(--accent); background: rgba(245, 158, 11, 0.1); }
+        .loss { border-left: 5px solid #f87171; background: rgba(248, 113, 113, 0.1); }
     </style>
 </head>
 <body>
 
-<div class="nav-tabs">
-    <button class="tab-btn active" onclick="openTab('online')">🌐 ONLAÝN</button>
-    <button class="tab-btn" onclick="openTab('manual')">✍️ EL BILEN</button>
-</div>
-
-<div id="online" class="content active">
-    <div class="card">
-        <h3>Janly Oýunlar</h3>
-        <button class="btn" onclick="fetchLiveMatches()">OÝUNLARY GÖR</button>
-        <div id="loading" style="display:none; text-align:center; margin:15px;">🔍 Robot gözleýär...</div>
-        <div id="match-list" style="margin-top: 15px;"></div>
+<div class="card">
+    <h2>⚽ AI PRO ANALYZER</h2>
+    
+    <div class="input-group">
+        <label>Öý Komandasy (Meselem: Real)</label>
+        <input type="text" id="hN" placeholder="Ady">
     </div>
-</div>
 
-<div id="manual" class="content">
-    <div class="card">
-        <h3>El bilen Analiz</h3>
-        <input type="text" id="hN" placeholder="Öý komandasy">
-        <input type="text" id="aN" placeholder="Myhman komandasy">
-        <input type="number" id="hX" placeholder="Öý xG">
-        <input type="number" id="aX" placeholder="Myhman xG">
-        <button class="btn" style="background:var(--secondary);" onclick="calcManual()">HASAPLA</button>
-        <div id="resManual" style="margin-top:15px; padding:10px; background:#0f172a; border-radius:8px; display:none;"></div>
+    <div class="input-group">
+        <label>Myhman Komandasy (Meselem: Barsa)</label>
+        <input type="text" id="aN" placeholder="Ady">
     </div>
+
+    <div style="display: flex; gap: 10px;">
+        <div class="input-group">
+            <label>Öý Koeffisiýent</label>
+            <input type="number" id="hK" step="0.01" placeholder="1.80">
+        </div>
+        <div class="input-group">
+            <label>Myhman Koef.</label>
+            <input type="number" id="aK" step="0.01" placeholder="3.20">
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Komandalaryň Gerekli Güýji (1-10 aralyk)</label>
+        <input type="number" id="hP" placeholder="Öý güýji (Kubok/Forma)">
+    </div>
+
+    <button class="btn" onclick="analyzeMatch()">ROBOTYŇ NETIJESINI GÖR</button>
+
+    <div id="result"></div>
 </div>
 
 <script>
-    function openTab(t) {
-        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(t).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
-
-    async function fetchLiveMatches() {
-        const list = document.getElementById('match-list');
-        const loader = document.getElementById('loading');
-        // Proxy kynçylyk berýän bolsa, göni baglanmaga synanyşýarys
-        const apiKey = 'b622ef1831d04997955869882fa1822d';
-
-        loader.style.display = 'block';
-        list.innerHTML = '';
-
-        try {
-            const res = await fetch('https://api.football-data.org/v4/matches', {
-                headers: { 'X-Auth-Token': apiKey }
-            });
-            
-            if (!res.ok) throw new Error('API Error');
-            const data = await res.json();
-
-            if (data.matches && data.matches.length > 0) {
-                data.matches.slice(0, 10).forEach(m => {
-                    const utc = new Date(m.utcDate);
-                    const tkm = new Date(utc.getTime() + (5 * 3600000));
-                    list.innerHTML += `<div class="match-card">
-                        <b>${m.homeTeam.name} vs ${m.awayTeam.name}</b>
-                        <div class="time-box">🇹🇲 TKM: ${tkm.getUTCHours().toString().padStart(2,'0')}:${tkm.getUTCMinutes().toString().padStart(2,'0')}</div>
-                        <div style="color:var(--secondary); font-weight:bold;">AI: ${Math.random() > 0.5 ? 'W1' : 'W2'}</div>
-                    </div>`;
-                });
-            } else {
-                list.innerHTML = "Şu wagt mugt ligalarda oýun ýok. 'EL BILEN' bölümini ulanmagy dowam ediň.";
-            }
-        } catch (e) {
-            list.innerHTML = "Onlaýn ulgamda wagtlaýynça bökdençlik bar. Lütfün, aşaky düwmä geçip 'EL BILEN' hasaplatyň.";
-        } finally {
-            loader.style.display = 'none';
+    function analyzeMatch() {
+        const hName = document.getElementById('hN').value || "Öý komandasy";
+        const aName = document.getElementById('aN').value || "Myhman komandasy";
+        const hCoef = parseFloat(document.getElementById('hK').value) || 2.0;
+        const aCoef = parseFloat(document.getElementById('aK').value) || 2.0;
+        const hPower = parseFloat(document.getElementById('hP').value) || 5;
+        
+        const resDiv = document.getElementById('result');
+        resDiv.style.display = "block";
+        
+        // Robot logikasy: Koeffisiýent we güýç birleşmesi
+        let hScore = (1 / hCoef) * 100 + (hPower * 2);
+        let aScore = (1 / aCoef) * 100;
+        
+        let verdict = "";
+        let styleClass = "";
+        
+        if (hScore > aScore + 15) {
+            verdict = `🔥 <b>ROBOTYŇ NETIJESI:</b> <br>Bu oýunda <b>${hName}</b> ýeňiş gazanmaly (W1). <br>Ähtimallyk: %${Math.min(90, hScore.toFixed(1))}`;
+            styleClass = "win";
+        } else if (aScore > hScore + 15) {
+            verdict = `🔥 <b>ROBOTYŇ NETIJESI:</b> <br>Bu oýunda <b>${aName}</b> ýeňiş gazanar (W2). <br>Ähtimallyk: %${Math.min(90, aScore.toFixed(1))}`;
+            styleClass = "loss";
+        } else {
+            verdict = `⚖️ <b>ROBOTYŇ NETIJESI:</b> <br>Oýun gaty deň geçýär. <b>Deňme-deň (X)</b> ýa-da "Gerekli Güýji" ýokary bolan tarap azajyk öňe saýlanar.`;
+            styleClass = "draw";
         }
-    }
-
-    function calcManual() {
-        const h = document.getElementById('hN').value || "Öý";
-        const hx = parseFloat(document.getElementById('hX').value) || 0;
-        const ax = parseFloat(document.getElementById('aX').value) || 0;
-        const res = document.getElementById('resManual');
-        res.style.display = "block";
-        const win = ((hx / (hx + ax + 0.1)) * 100).toFixed(1);
-        res.innerHTML = `⚽ ${h} utuş ähtimallygy: %${win}<br>🎯 Hasap: ${Math.round(hx)} - ${Math.round(ax)}`;
+        
+        resDiv.innerHTML = verdict;
+        resDiv.className = styleClass;
     }
 </script>
+
 </body>
 </html>

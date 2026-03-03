@@ -1,35 +1,29 @@
-# ⚽ Football Predictor AI - Professional Edition
+# ⚽ PRO-BET AI ROBOT v3.0
 
-This is a professional-grade football match analysis tool developed in **Python**. It uses statistical data and xG (Expected Goals) metrics to provide match outcome probabilities.
-
----
-
-## ✨ Key Features
-* **Modern UI:** Built with `CustomTkinter` for a sleek, dark-themed sports dashboard experience.
-* **AI-Powered Logic:** Calculates win probabilities and expected scores based on performance metrics.
-* **Smart Advice:** Provides automated betting insights (e.g., Over 2.5 goals, Home Win).
+Professional football analytics tool with **Real-time API integration** and **Multi-language support**.
 
 ---
 
-## 🛠️ Setup & Usage Guide
+## 🌍 Languages Supported
+- 🇹🇲 **Turkmen**
+- 🇬🇧 **English**
+- 🇷🇺 **Russian**
 
-To get this professional analyzer running on your local machine, follow these steps combined into one simple process:
+---
 
-### 1. Requirements
-Make sure you have **Python 3.x** installed on your system.
+## ✨ Täze Aýratynlyklar (New Features)
+- **Live API Integration:** `requests` kitaphanasy arkaly onlaýn maglumat çekiş ulgamy.
+- **Multithreading:** `threading` ulanylyp, maglumat çekilýän wagty programmanyň doňmazlygy üpjün edildi.
+- **Modern UI:** CustomTkinter arkaly döwrebap "Sport Blue" dizaýny.
+- **Dynamic Language Switch:** Programmanyň içinden bada-bat dil çalşyjy.
 
-### 2. Installation & Run
-Copy and paste the following commands into your terminal or command prompt:
+---
 
+## 🛠️ Gurnamak we İşletmek (Setup & Run)
+
+Programmany öz kompýuteriňizde işletmek üçin aşakdaky ädimleri yzarlaň:
+
+### 1. Kitaphanalary ýüklemek:
 ```bash
-# Clone the project to your computer
-git clone [https://github.com/YOUR_USERNAME/Football-Predictor-AI.git](https://github.com/YOUR_USERNAME/Football-Predictor-AI.git)
+pip install customtkinter requests
 
-# Enter the project folder
-cd Football-Predictor-AI
-
-# Install the modern UI library
-pip install customtkinter
-
-# Start the application
-python main.py
